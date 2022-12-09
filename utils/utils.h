@@ -2,11 +2,33 @@
 // Created by indemind on 12/8/22.
 //
 
-#ifndef DEPTH_CLOUD_POINT_GET_CAMERA_PARAMETER_H
-#define DEPTH_CLOUD_POINT_GET_CAMERA_PARAMETER_H
+#ifndef DEPTH_CLOUD_POINT_UTILS_H
+#define DEPTH_CLOUD_POINT_UTILS_H
 
 #include <iostream>
 #include <string>
+
+// PCL 库
+#include <pcl/io/pcd_io.h>
+#include <pcl/io/ply_io.h>
+#include <pcl/point_types.h>
+#include <pcl/visualization/cloud_viewer.h>
+#include <pcl/common/transforms.h>
+#include <Eigen/Core>
+// OpenCV 库
+#include <opencv2/core/core.hpp>
+#include <opencv2/highgui/highgui.hpp>
+
+// 定义点云类型
+typedef pcl::PointXYZRGBA PointT;
+typedef pcl::PointCloud<PointT> PointCloud;
+
+double camera_factor = 1000;
+double camera_cx;// = 325.5;
+double camera_cy;// = 253.5;
+double camera_fx;// = 518.0;
+double camera_fy;// = 519.0;
+
 namespace psl
 {
     struct CameraParam
@@ -49,5 +71,8 @@ namespace psl
 
 bool GetCameraParameter(const std::string& configFile, psl::CameraParam &camera);
 
+void ReadPointCloud(const std::string &pointCloudSavePLY);
 
-#endif //DEPTH_CLOUD_POINT_GET_CAMERA_PARAMETER_H
+void SaveCloudPoint(const std::string &imageL, const std::string &image);
+
+#endif //DEPTH_CLOUD_POINT_UTILS_H

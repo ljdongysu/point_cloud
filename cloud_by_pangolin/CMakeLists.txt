@@ -7,7 +7,7 @@ find_package(OpenCV REQUIRED)
 
 set(CMAKE_CXX_STANDARD 14)
 
-include_directories(../get_camera)
+include_directories(../utils)
 
 include_directories(${Pangolin_LIBRARIES})
 link_directories(${Pangolin_LIBRARY_DIRS})

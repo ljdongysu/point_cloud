@@ -1,5 +1,6 @@
 cmake_minimum_required(VERSION 3.20)
-project(depth_cloud_point)
+project(cloud_point_save_show)
+project(cloud_point_read_show)
 
 find_package(PCL REQUIRED)
 find_package(OpenCV REQUIRED)
@@ -11,16 +12,21 @@ include_directories(${PCL_INCLUDE_DIRS})
 link_directories(${PCL_LIBRARY_DIRS})
 add_definitions(${PCL_DEFINITIONS})
 
+include_directories(${OpenCV_INCLUDE_DIRS})
+
 add_subdirectory(cloud_by_pcl)
 add_subdirectory(cloud_by_pangolin)
 
-add_library(GetCamera SHARED get_camera/get_camera_parameter.cpp get_camera/get_camera_parameter.h )
-target_link_libraries(GetCamera ${OpenCV_LIBS} -ldl)
-
+add_library(GetCamera SHARED utils/utils.cpp utils/utils.h)
+target_link_libraries(GetCamera ${OpenCV_LIBS} ${VTK_LIBRARIES} ${PCL_LIBRARIES} -ldl)
 
 include_directories(${VTK_INCLUDE_DIRS})
 link_directories(${VTK_LIBRARY_DIRS})
 
-add_executable(depth_cloud_point main.cpp)
+add_executable(cloud_point_save_show main.cpp)
 
-target_link_libraries (depth_cloud_point ${VTK_LIBRARIES} ${PCL_LIBRARIES})
+target_link_libraries (cloud_point_save_show ${VTK_LIBRARIES} ${PCL_LIBRARIES} GetCamera)
+
+add_executable(cloud_point_read_show read_point_cloud_show.cpp)
+
+target_link_libraries (cloud_point_read_show ${VTK_LIBRARIES} ${PCL_LIBRARIES} GetCamera)

@@ -13,7 +13,16 @@
 2. https://vtk.org/files/release/7.1/VTK-7.1.1.zip 和https://github.com/PointCloudLibrary/pcl/tree/pcl-1.12.1 下载VTK和PCL库
 3. 安装流程参考 https://www.notion.so/indemind/d8044f8f347e40f095629658ac7c99a1
 
+## 运行
+ - 运行时候添加VTK库路径
+### PSL保存点云图
+./cloud_point_save_show 左目图像.jpg  深度/视差图像.png 相机参数config.yaml
+rgb image file path: [string]
+depth or disparity image file path: [string]
+camera config file path: [string]
 
+### PSL 加载点云图
+./cloud_point_read_show  *.ply
 ### 运行
 1. 可能报错找不到指定库，需要再运行时候添加对应库路径
 2. cloud_by_pcl 目前看效果更好一些

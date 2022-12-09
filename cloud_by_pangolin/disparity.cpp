@@ -7,17 +7,22 @@
 #include <Eigen/Core>
 #include <pangolin/pangolin.h>
 #include <unistd.h>
-#include "../get_camera/get_camera_parameter.h"
+#include "../utils/utils.h"
 
 using namespace std;
 using namespace Eigen;
 
 // 文件路径，如果不对，请调整
 
+//string right_file = "/data/Depth/data/20221111_depth_distance_sparse3/20221111_902_distance_0/20221111_0818/cam1/28_1668154708419269.jpg";
+//string left_file = "/data/Depth/data/20221111_depth_distance_sparse3/20221111_902_distance_0/20221111_0818/cam0/28_1668154708419269.jpg";
+//string disparity_file = "/data/Depth/data/20221111_depth_distance_sparse3/gray/20221111_902_distance_0/20221111_0818/cam0/28_1668154708419269.png";
+//std::string configFile = "/data/Depth/data/20221111_depth_distance_sparse3/20221111_902_distance_0/config.yaml";
+
 string left_file = "/data/Depth/data/20221111_depth_distance_sparse3/20221111_902_distance_0/20221111_0818/cam0/28_1668154708419269.jpg";
-string right_file = "/data/Depth/data/20221111_depth_distance_sparse3/20221111_902_distance_0/20221111_0818/cam1/28_1668154708419269.jpg";
 string disparity_file = "/data/Depth/data/20221111_depth_distance_sparse3/gray/20221111_902_distance_0/20221111_0818/cam0/28_1668154708419269.png";
 std::string configFile = "/data/Depth/data/20221111_depth_distance_sparse3/20221111_902_distance_0/config.yaml";
+
 //笔记：
 //拿到left.png  right.png disparity.png 三张图，但是right.png实际上是没有用到的。
 //以left中像素点进行遍历，与left每个像素点对应，在disparity中有每个点的视差信息，用0-255表示。
@@ -54,7 +59,7 @@ int main(int argc, char **argv) {
     // 间距
     double b = 0.05; // 通过Pr[3]/Pl[0] 获取，得到这个数据。
     //焦距  0.00027 * fx    ; 0.00027 * fy 可能是K的，也可能是P的，目前使用P的   0.00027 = dx/image.size
-    double f = 0.0766;//    0.00027
+    double f = fx * (17.3/640)/100;//0.0766;//    0.00027
 
     // 读取图像
     cv::Mat left = cv::imread(left_file, 0);
