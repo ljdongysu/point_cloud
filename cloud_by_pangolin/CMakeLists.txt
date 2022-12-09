@@ -4,6 +4,7 @@ project(pangolin_point_cloud)
 find_package(Pangolin REQUIRED)
 find_package(OpenCV REQUIRED)
 
+
 set(CMAKE_CXX_STANDARD 14)
 
 include_directories(../get_camera)

@@ -12,5 +12,5 @@ add_definitions(${PCL_DEFINITIONS})
 
 add_executable(pcl_point_cloud pcl_cloud_point.cpp)
 
-target_link_libraries (pcl_point_cloud ${PCL_LIBRARIES} ${OpenCV_LIBS})
+target_link_libraries (pcl_point_cloud ${PCL_LIBRARIES} ${OpenCV_LIBS} GetCamera)
 

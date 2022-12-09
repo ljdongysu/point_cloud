@@ -17,6 +17,7 @@ using namespace Eigen;
 string left_file = "/data/Depth/data/20221111_depth_distance_sparse3/20221111_902_distance_0/20221111_0818/cam0/28_1668154708419269.jpg";
 string right_file = "/data/Depth/data/20221111_depth_distance_sparse3/20221111_902_distance_0/20221111_0818/cam1/28_1668154708419269.jpg";
 string disparity_file = "/data/Depth/data/20221111_depth_distance_sparse3/gray/20221111_902_distance_0/20221111_0818/cam0/28_1668154708419269.png";
+std::string configFile = "/data/Depth/data/20221111_depth_distance_sparse3/20221111_902_distance_0/config.yaml";
 //笔记：
 //拿到left.png  right.png disparity.png 三张图，但是right.png实际上是没有用到的。
 //以left中像素点进行遍历，与left每个像素点对应，在disparity中有每个点的视差信息，用0-255表示。
@@ -27,32 +28,31 @@ void showPointCloud(const vector<Vector4d, Eigen::aligned_allocator<Vector4d>> &
 
 int main(int argc, char **argv) {
     psl::CameraParam camera;
-    std::string file = "/data/Depth/data/20221111_depth_distance_sparse3/20221111_902_distance_0/config.yaml";
-    GetCameraParameter(file, camera);
+    GetCameraParameter(configFile, camera);
 
-    for (int i = 0; i < 12; ++i)
-    {
-        std::cout << "camera._P["<<i<<"]: " << camera._P[i]<<", ";
-    }
-    std::cout << std::endl;
-
-    for (int i = 0; i < 9; ++i)
-    {
-        std::cout << "camera._K["<<i<<"]: " << camera._K[i]<<", ";
-    }
-    std::cout << std::endl;
-
-    for (int i = 0; i < 9; ++i)
-    {
-        std::cout << "camera._R["<<i<<"]: " << camera._R[i]<<", ";
-    }
-    std::cout << std::endl;
+//    for (int i = 0; i < 12; ++i)
+//    {
+//        std::cout << "camera._P["<<i<<"]: " << camera._P[i]<<", ";
+//    }
+//    std::cout << std::endl;
+//
+//    for (int i = 0; i < 9; ++i)
+//    {
+//        std::cout << "camera._K["<<i<<"]: " << camera._K[i]<<", ";
+//    }
+//    std::cout << std::endl;
+//
+//    for (int i = 0; i < 9; ++i)
+//    {
+//        std::cout << "camera._R["<<i<<"]: " << camera._R[i]<<", ";
+//    }
+//    std::cout << std::endl;
     // 内参
     //是左相机点缩放系数fx fy,和平移系数cx cy
 //    double fx = 718.856, fy = 718.856, cx = 607.1928, cy = 185.2157;
     double fx = camera._P[0],  fy= camera._P[5], cx = camera._P[2], cy = camera._P[6];  // 改为K
     // 间距
-    double b = 0.05; // 0.05
+    double b = 0.05; // 通过Pr[3]/Pl[0] 获取，得到这个数据。
     //焦距  0.00027 * fx    ; 0.00027 * fy 可能是K的，也可能是P的，目前使用P的   0.00027 = dx/image.size
     double f = 0.0766;//    0.00027
 
@@ -77,7 +77,6 @@ int main(int argc, char **argv) {
             //视差图disparty中(v,u)点，带有视差信息d，其深度d用像素值来表达0-255之间
             if(d==0)
                 continue;  //视差d=0表示该点没有深度不用估计
-            cout<<d<<endl;
             //基线长度b=0.573  Z=fb/d  f是内参--焦距，b是基线长度，d是视差
             double z=(f*b*1000)/d;
 
