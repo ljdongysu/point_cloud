@@ -73,6 +73,6 @@ bool GetCameraParameter(const std::string& configFile, psl::CameraParam &camera)
 
 void ReadPointCloud(const std::string &pointCloudSavePLY);
 
-void SaveCloudPoint(const std::string &imageL, const std::string &image);
+void SaveCloudPoint(const std::string &imageL, const std::string &image, const std::string imageType);
 
 #endif //DEPTH_CLOUD_POINT_UTILS_H

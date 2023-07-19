@@ -83,12 +83,13 @@ using namespace std;
 
 int main(int argc, char ** argv)
 {
-    if (argc < 4)
+    if (argc < 5)
     {
         std::cout << "please input: " << std::endl;
         std::cout << "\trgb image file path: [string]" << std::endl;
         std::cout << "\tdepth or disparity image file path: [string]" << std::endl;
         std::cout << "\tcamera config file path: [string]" << std::endl;
+        std::cout << "\tinput depth or disparity types: [string:depth or disparity]" << std::endl;
         std::cout <<"error!"<< std::endl;
         return 0;
     }
@@ -97,6 +98,7 @@ int main(int argc, char ** argv)
     std::string rgbImageFile = argv[1];//"/data/Depth/data/20221111_depth_distance_sparse3/20221111_902_distance_0/20221111_0818/cam0/28_1668154708419269.jpg";
     std::string depthDisparityImageFile = argv[2];// "/data/Depth/data/20221111_depth_distance_sparse3/depth/20221111_902_distance_0/20221111_0818/cam0/28_1668154708419269.png";
     std::string file = argv[3];//"/data/Depth/data/20221111_depth_distance_sparse3/20221111_902_distance_0/config.yaml";
+    std::string imageType = argv[4];
     psl::CameraParam camera;
 
     GetCameraParameter(file, camera);
@@ -106,7 +108,7 @@ int main(int argc, char ** argv)
     camera_cx = camera._P[2];
     camera_cy = camera._P[6];
 
-    SaveCloudPoint(rgbImageFile,depthDisparityImageFile);
+    SaveCloudPoint(rgbImageFile,depthDisparityImageFile, imageType);
 
     return 0;
 }

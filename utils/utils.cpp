@@ -36,15 +36,16 @@ bool GetCameraParameter(const std::string& configFile, psl::CameraParam &camera)
 }
 
 
-void SaveCloudPoint(const std::string &imageL, const std::string &image)
+void SaveCloudPoint(const std::string &imageL, const std::string &image, const std::string imageType)
 {
+    std::cout <<"use image type depth or disparity: " << imageType << std::endl;
     cv::Mat rgb, depth;
     rgb = cv::imread(imageL);
     depth = cv::imread(image, -1);  //在cv::imread参数中加入-1，表示不改变读取图像的类型直接读取
     std::string pointCloudSavePLY = image.substr(0, image.find_last_of('.')) + PCL_DISPARITY + ".ply";
     std::string pointCloudSavePCD = image.substr(0, image.find_last_of('.')) + PCL_DISPARITY + ".pcd";
 
-    if (depth.channels() == 3)
+    if (depth.channels() == 3 and (imageType == "depth"))
     {
         pointCloudSavePLY = pointCloudSavePLY.substr(0, pointCloudSavePLY.find_last_of('_')) + "_" + PCL_DEPTH + ".ply";
         pointCloudSavePCD = pointCloudSavePCD.substr(0, pointCloudSavePCD.find_last_of('.')) + "_" + PCL_DEPTH + ".pcd";
@@ -63,9 +64,10 @@ void SaveCloudPoint(const std::string &imageL, const std::string &image)
             unsigned int d=depth.at<uchar>(m,n);
 
             //使用深度图
-            if (depth.channels() == 3)
+            if (depth.channels() == 3 and (imageType == "depth"))
             {
                 d = depth.at<uchar>(m,n*3) + depth.at<uchar>(m,n*3 + 1) + depth.at<uchar>(m,n*3+2);
+                std::cout <<" depth:3" << std::endl;
             }
 
             //使用视差图
@@ -80,10 +82,11 @@ void SaveCloudPoint(const std::string &imageL, const std::string &image)
             //            p.z = double(d) / camera_factor;
 
             // 使用视差图
-            p.z = double(1420.0 / d) / camera_factor;
-
-            //使用深度图
-            if (depth.channels() == 3)
+            if ((imageType == "disparity"))
+            {
+                p.z = double(1420.0 / d) / camera_factor;
+            }
+            else if(imageType == "depth")//使用深度图
             {
                 p.z = double(d) / camera_factor;
             }
