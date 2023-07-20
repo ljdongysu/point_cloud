@@ -20,6 +20,7 @@
 rgb image file path: [string]
 depth or disparity image file path: [string]
 camera config file path: [string]
+input depth or disparity types: [string:depth or disparity]
 
 ### PSL 加载点云图
 ./cloud_point_read_show  *.ply
