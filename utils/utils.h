@@ -28,6 +28,7 @@ double camera_cx;// = 325.5;
 double camera_cy;// = 253.5;
 double camera_fx;// = 518.0;
 double camera_fy;// = 519.0;
+double bf;
 
 namespace psl
 {

@@ -79,14 +79,14 @@ void SaveCloudPoint(const std::string &imageL, const std::string &image)
             // 使用深度图像
             //            p.z = double(d) / camera_factor;
 
-            // 使用视差图
-            p.z = double(1420.0 / d) / camera_factor;
-
-            //使用深度图
-            if (depth.channels() == 3)
-            {
+//            // 使用视差图
+//            p.z = double(3423.0 / d) / camera_factor;
+//
+//            //使用深度图
+//            if (depth.channels() == 3)
+//            {
                 p.z = double(d) / camera_factor;
-            }
+//            }
 
             p.x = (n - camera_cx) * p.z / camera_fx;
             p.y = (m - camera_cy) * p.z / camera_fy;
