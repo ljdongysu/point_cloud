@@ -35,23 +35,8 @@ bool GetCameraParameter(const std::string& configFile, psl::CameraParam &camera)
     return true;
 }
 
-
-void SaveCloudPoint(const std::string &imageL, const std::string &image)
+void Depth2PointCloud(const cv::Mat &depth, const cv::Mat &rgb, PointCloud::Ptr cloud, bool usedTof)
 {
-    cv::Mat rgb, depth;
-    rgb = cv::imread(imageL);
-    depth = cv::imread(image, -1);  //在cv::imread参数中加入-1，表示不改变读取图像的类型直接读取
-    std::string pointCloudSavePLY = image.substr(0, image.find_last_of('.')) + PCL_DISPARITY + ".ply";
-    std::string pointCloudSavePCD = image.substr(0, image.find_last_of('.')) + PCL_DISPARITY + ".pcd";
-
-    if (depth.channels() == 3)
-    {
-        pointCloudSavePLY = pointCloudSavePLY.substr(0, pointCloudSavePLY.find_last_of('_')) + "_" + PCL_DEPTH + ".ply";
-        pointCloudSavePCD = pointCloudSavePCD.substr(0, pointCloudSavePCD.find_last_of('.')) + "_" + PCL_DEPTH + ".pcd";
-    }
-
-    PointCloud::Ptr cloud(new PointCloud);
-    // 遍历深度图
     for (int m = 0; m < depth.rows; m++)
         for (int n = 0; n < depth.cols; n++)
         {
@@ -62,8 +47,24 @@ void SaveCloudPoint(const std::string &imageL, const std::string &image)
             //使用视差图
             unsigned int d=depth.at<uchar>(m,n);
 
+            //使用tof点
+            if (usedTof)
+            {
+                if ( depth.at<uchar>(m,n*3+2) > 0)
+                {
+                    d = 511 + depth.at<uchar>(m,n*3+2);
+                }
+                else if (depth.at<uchar>(m,n*3 + 1) > 0)
+                {
+                    d = 255 + depth.at<uchar>(m,n*3+1);
+                }
+                else
+                {
+                    d = depth.at<uchar>(m,n*3);
+                }
+            }
             //使用深度图
-            if (depth.channels() == 3)
+            else if (depth.channels() == 3)
             {
                 d = depth.at<uchar>(m,n*3) + depth.at<uchar>(m,n*3 + 1) + depth.at<uchar>(m,n*3+2);
             }
@@ -76,30 +77,56 @@ void SaveCloudPoint(const std::string &imageL, const std::string &image)
             PointT p;
 
             // 计算这个点的空间坐标
-            // 使用深度图像
-            //            p.z = double(d) / camera_factor;
-
-//            // 使用视差图
-//            p.z = double(3423.0 / d) / camera_factor;
-//
-//            //使用深度图
-//            if (depth.channels() == 3)
-//            {
-                p.z = double(d) / camera_factor;
-//            }
-
+            p.z = double(d) / camera_factor;
             p.x = (n - camera_cx) * p.z / camera_fx;
             p.y = (m - camera_cy) * p.z / camera_fy;
 
-            //            // 从rgb图像中获取它的颜色
-            //            // rgb是三通道的BGR格式图，所以按下面的顺序获取颜色
-            p.b = rgb.ptr<uchar>(m)[n * 3];
-            p.g = rgb.ptr<uchar>(m)[n * 3 + 1];
-            p.r = rgb.ptr<uchar>(m)[n * 3 + 2];
+            // 从rgb图像中获取它的颜色
+            // rgb是三通道的BGR格式图，所以按下面的顺序获取颜色
+            if (not usedTof)
+            {
+                p.b = rgb.ptr<uchar>(m)[n * 3];
+                p.g = rgb.ptr<uchar>(m)[n * 3 + 1];
+                p.r = rgb.ptr<uchar>(m)[n * 3 + 2];
+            }
+            else
+            {
+                p.b = 0;
+                p.g = 0;
+                p.r = 250;
+            }
 
             // 把p加入到点云中
             cloud->points.push_back(p);
         }
+}
+
+void SaveCloudPoint(const std::string &imageL, const std::string &image
+                    , const std::string &tofImageFile)
+{
+    cv::Mat rgb, depth, tofImage;
+    bool usedTof = false;
+    std::string pointCloudSavePLY = image.substr(0, image.find_last_of('.')) + PCL_DEPTH + ".ply";
+    std::string pointCloudSavePCD = image.substr(0, image.find_last_of('.')) + PCL_DEPTH + ".pcd";
+
+    rgb = cv::imread(imageL);
+    depth = cv::imread(image, -1);  //在cv::imread参数中加入-1，表示不改变读取图像的类型直接读取
+
+    if (tofImageFile != "")
+    {
+        usedTof = true;
+        tofImage = cv::imread(tofImageFile, -1);
+    }
+
+    PointCloud::Ptr cloud(new PointCloud);
+
+    // 读入tof点深度图像转为3D点云
+    if (usedTof)
+    {
+        Depth2PointCloud(tofImage, rgb, cloud, usedTof);
+    }
+    //双目深度图像转为3D点云
+    Depth2PointCloud(depth, rgb, cloud);
 
     //绕Z轴旋转180度
     Eigen::Matrix4f transform_1 = Eigen::Matrix4f::Identity();
@@ -108,7 +135,7 @@ void SaveCloudPoint(const std::string &imageL, const std::string &image)
     transform_1(0, 1) = -sin(theta);
     transform_1(1, 0) = sin(theta);
     transform_1(1, 1) = cos(theta);
-    //    pcl::transformPointCloud(*cloud, *cloud, transform_1);
+    pcl::transformPointCloud(*cloud, *cloud, transform_1);
 
     // 设置并保存点云
     cloud->height = 1;

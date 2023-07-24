@@ -93,27 +93,26 @@ int main(int argc, char ** argv)
         return 0;
     }
     // 图像矩阵
-
     std::string rgbImageFile = argv[1];//"/data/Depth/data/20221111_depth_distance_sparse3/20221111_902_distance_0/20221111_0818/cam0/28_1668154708419269.jpg";
     std::string depthDisparityImageFile = argv[2];// "/data/Depth/data/20221111_depth_distance_sparse3/depth/20221111_902_distance_0/20221111_0818/cam0/28_1668154708419269.png";
     std::string file = argv[3];//"/data/Depth/data/20221111_depth_distance_sparse3/20221111_902_distance_0/config.yaml";
+    std::string tofImageFile = "";
+
+    if (argc >4)
+    {
+        tofImageFile = argv[4];
+    }
+
     psl::CameraParam camera;
 
     GetCameraParameter(file, camera);
-    //P_rect_00: 7.215377e+02 0.000000e+00 6.095593e+02 0.000000e+00 0.000000e+00 7.215377e+02 1.728540e+02 0.000000e+00 0.000000e+00 0.000000e+00 1.000000e+00 0.000000e+00
-    //P_rect_01: 7.215377e+02 0.000000e+00 6.095593e+02 -3.875744e+02 0.000000e+00 7.215377e+02 1.728540e+02 0.000000e+00 0.000000e+00 0.000000e+00 1.000000e+00 0.000000e+00
-    //P_rect_02: 7.215377e+02 0.000000e+00 6.095593e+02 4.485728e+01 0.000000e+00 7.215377e+02 1.728540e+02 2.163791e-01 0.000000e+00 0.000000e+00 1.000000e+00 2.745884e-03
-    //P_rect_03: 7.215377e+02 0.000000e+00 6.095593e+02 -3.395242e+02 0.000000e+00 7.215377e+02 1.728540e+02 2.199936e+00 0.000000e+00 0.000000e+00 1.000000e+00 2.729905e-03
-//    camera_fx = 721.53;//camera._P[0];
-//    camera_fy= 721.53;//camera._P[5];
-//    camera_cx = 609.5;//camera._P[2];
-//    camera_cy = 172.8;//camera._P[6];
+
     camera_fx = camera._P[0];
     camera_fy= camera._P[5];
     camera_cx = camera._P[2];
     camera_cy = camera._P[6];
 
-    SaveCloudPoint(rgbImageFile,depthDisparityImageFile);
+    SaveCloudPoint(rgbImageFile,depthDisparityImageFile, tofImageFile);
 
     return 0;
 }

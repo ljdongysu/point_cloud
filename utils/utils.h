@@ -23,12 +23,11 @@
 typedef pcl::PointXYZRGBA PointT;
 typedef pcl::PointCloud<PointT> PointCloud;
 
-double camera_factor = 1000;
+double camera_factor = 100;
 double camera_cx;// = 325.5;
 double camera_cy;// = 253.5;
 double camera_fx;// = 518.0;
 double camera_fy;// = 519.0;
-double bf;
 
 namespace psl
 {
@@ -74,6 +73,8 @@ bool GetCameraParameter(const std::string& configFile, psl::CameraParam &camera)
 
 void ReadPointCloud(const std::string &pointCloudSavePLY);
 
-void SaveCloudPoint(const std::string &imageL, const std::string &image);
+void SaveCloudPoint(const std::string &imageL, const std::string &image
+                    , const std::string &tofImage = "");
 
+void Depth2PointCloud(const cv::Mat &depth, const cv::Mat &rgb, PointCloud::Ptr cloud, bool usedTof = false);
 #endif //DEPTH_CLOUD_POINT_UTILS_H
