@@ -74,7 +74,10 @@ bool GetCameraParameter(const std::string& configFile, psl::CameraParam &camera)
 void ReadPointCloud(const std::string &pointCloudSavePLY);
 
 void SaveCloudPoint(const std::string &imageL, const std::string &image
-                    , const std::string &tofImage = "");
+                    , const std::string &tofImage = "", const std::string &slamDepthFile = "");
 
 void Depth2PointCloud(const cv::Mat &depth, const cv::Mat &rgb, PointCloud::Ptr cloud, bool usedTof = false);
+
+bool GetSlamDepth(const std::string& yamlFile, cv::Mat &slamDepthImage);
+
 #endif //DEPTH_CLOUD_POINT_UTILS_H

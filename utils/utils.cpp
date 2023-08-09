@@ -35,6 +35,28 @@ bool GetCameraParameter(const std::string& configFile, psl::CameraParam &camera)
     return true;
 }
 
+void ThreeD2PointCloud(const cv::Mat &depth, const cv::Mat &rgb, PointCloud::Ptr cloud)
+{
+    for (int m = 0; m < depth.rows; m++)
+    {
+        for (int n = 0; n < depth.cols; n++)
+        {
+            PointT p;
+            if (depth.at<float>(m,n*3) < 250 or depth.at<float>(m,n*3 + 1) < 250 or depth.at<float>(m,n*3+2) < 250)
+            {
+                int k = 1;
+            }
+            p.x = depth.at<float>(m,n*3);
+            p.y = depth.at<float>(m,n*3+1);
+            p.z = depth.at<float>(m,n*3+2);
+            p.b = 0;
+            p.g = 250;
+            p.r = 0;
+            cloud->points.push_back(p);
+        }
+    }
+}
+
 void Depth2PointCloud(const cv::Mat &depth, const cv::Mat &rgb, PointCloud::Ptr cloud, bool usedTof)
 {
     for (int m = 0; m < depth.rows; m++)
@@ -85,9 +107,12 @@ void Depth2PointCloud(const cv::Mat &depth, const cv::Mat &rgb, PointCloud::Ptr 
             // rgb是三通道的BGR格式图，所以按下面的顺序获取颜色
             if (not usedTof)
             {
-                p.b = rgb.ptr<uchar>(m)[n * 3];
-                p.g = rgb.ptr<uchar>(m)[n * 3 + 1];
-                p.r = rgb.ptr<uchar>(m)[n * 3 + 2];
+//                p.b = rgb.ptr<uchar>(m)[n * 3];
+//                p.g = rgb.ptr<uchar>(m)[n * 3 + 1];
+//                p.r = rgb.ptr<uchar>(m)[n * 3 + 2];
+                p.b = 250;rgb.ptr<uchar>(m)[n * 3];
+                p.g = 0;rgb.ptr<uchar>(m)[n * 3 + 1];
+                p.r =0; rgb.ptr<uchar>(m)[n * 3 + 2];
             }
             else
             {
@@ -102,7 +127,7 @@ void Depth2PointCloud(const cv::Mat &depth, const cv::Mat &rgb, PointCloud::Ptr 
 }
 
 void SaveCloudPoint(const std::string &imageL, const std::string &image
-                    , const std::string &tofImageFile)
+                    , const std::string &tofImageFile, const std::string &slamDepthFile)
 {
     cv::Mat rgb, depth, tofImage;
     bool usedTof = false;
@@ -119,6 +144,13 @@ void SaveCloudPoint(const std::string &imageL, const std::string &image
     }
 
     PointCloud::Ptr cloud(new PointCloud);
+
+    if (slamDepthFile != "")
+    {
+        cv::Mat slamDepthImage;
+        GetSlamDepth(slamDepthFile, slamDepthImage);
+        ThreeD2PointCloud(slamDepthImage, rgb, cloud);
+    }
 
     // 读入tof点深度图像转为3D点云
     if (usedTof)
@@ -142,8 +174,8 @@ void SaveCloudPoint(const std::string &imageL, const std::string &image
     cloud->width = cloud->points.size();
     cout << "point cloud size = " << cloud->points.size() << endl;
     cloud->is_dense = false;
-    pcl::io::savePLYFile(pointCloudSavePLY, *cloud);   //将点云数据保存为ply文件
-    pcl::io::savePCDFile(pointCloudSavePCD, *cloud);   //将点云数据保存为pcd文件
+//    pcl::io::savePLYFile(pointCloudSavePLY, *cloud);   //将点云数据保存为ply文件
+//    pcl::io::savePCDFile(pointCloudSavePCD, *cloud);   //将点云数据保存为pcd文件
 
     //显示点云图像
     pcl::visualization::CloudViewer viewer ("test");
@@ -165,4 +197,11 @@ void ReadPointCloud(const std::string &pointCloudSavePLY)
     while (!viewer.wasStopped()){ };
 
     cloudLoad->points.clear();
+}
+
+bool GetSlamDepth(const std::string& yamlFile, cv::Mat &slamDepthImage)
+{
+    cv::FileStorage fs(yamlFile,cv::FileStorage::READ);
+    fs["depth"]>> slamDepthImage;
+    return true;
 }
