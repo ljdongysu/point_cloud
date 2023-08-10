@@ -16,11 +16,12 @@
 ## 运行
  - 运行时候添加VTK库路径
 ### PSL显示并保存点云图
-./cloud_point_save_show 左目图像.jpg  深度.png 相机参数config.yaml tof点对应深度图像（可选参数）
+./cloud_point_save_show 左目图像.jpg  深度.png 相机参数config.yaml tof点对应深度图像（可选参数）立体匹配深的估计结果.png
 rgb image file path: [string]
 depth image file path: [string]
 camera config file path: [string]
 depth image of tof point file path: [string]
+depth image of slam point file path: [string]
 
 ### PSL 加载点云图
 ./cloud_point_read_show  *.ply

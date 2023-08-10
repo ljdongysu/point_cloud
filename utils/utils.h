@@ -76,7 +76,7 @@ void ReadPointCloud(const std::string &pointCloudSavePLY);
 void SaveCloudPoint(const std::string &imageL, const std::string &image
                     , const std::string &tofImage = "", const std::string &slamDepthFile = "");
 
-void Depth2PointCloud(const cv::Mat &depth, const cv::Mat &rgb, PointCloud::Ptr cloud, bool usedTof = false);
+void Depth2PointCloud(const cv::Mat &depth, const cv::Mat &rgb, PointCloud::Ptr cloud, bool usedTof = false, int color = 0);
 
 bool GetSlamDepth(const std::string& yamlFile, cv::Mat &slamDepthImage);
 

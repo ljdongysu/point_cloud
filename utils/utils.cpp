@@ -57,7 +57,7 @@ void ThreeD2PointCloud(const cv::Mat &depth, const cv::Mat &rgb, PointCloud::Ptr
     }
 }
 
-void Depth2PointCloud(const cv::Mat &depth, const cv::Mat &rgb, PointCloud::Ptr cloud, bool usedTof)
+void Depth2PointCloud(const cv::Mat &depth, const cv::Mat &rgb, PointCloud::Ptr cloud, bool usedTof, int color)
 {
     for (int m = 0; m < depth.rows; m++)
         for (int n = 0; n < depth.cols; n++)
@@ -105,7 +105,7 @@ void Depth2PointCloud(const cv::Mat &depth, const cv::Mat &rgb, PointCloud::Ptr 
 
             // 从rgb图像中获取它的颜色
             // rgb是三通道的BGR格式图，所以按下面的顺序获取颜色
-            if (not usedTof)
+            if (color == 0)
             {
 //                p.b = rgb.ptr<uchar>(m)[n * 3];
 //                p.g = rgb.ptr<uchar>(m)[n * 3 + 1];
@@ -114,11 +114,17 @@ void Depth2PointCloud(const cv::Mat &depth, const cv::Mat &rgb, PointCloud::Ptr 
                 p.g = 0;rgb.ptr<uchar>(m)[n * 3 + 1];
                 p.r =0; rgb.ptr<uchar>(m)[n * 3 + 2];
             }
-            else
+            else if(color ==1)
             {
                 p.b = 0;
                 p.g = 0;
                 p.r = 250;
+            }
+            else if (color ==2)
+            {
+                p.b = 0;
+                p.g = 250;
+                p.r = 0;
             }
 
             // 把p加入到点云中
@@ -147,19 +153,19 @@ void SaveCloudPoint(const std::string &imageL, const std::string &image
 
     if (slamDepthFile != "")
     {
-        cv::Mat slamDepthImage;
-        GetSlamDepth(slamDepthFile, slamDepthImage);
-        ThreeD2PointCloud(slamDepthImage, rgb, cloud);
+        cv::Mat slamDepthImage = cv::imread(slamDepthFile, -1);
+        Depth2PointCloud(slamDepthImage, rgb, cloud, usedTof, 2);
     }
+
+    //双目深度图像转为3D点云
+    Depth2PointCloud(depth, rgb, cloud, usedTof, 0);
 
     // 读入tof点深度图像转为3D点云
     if (usedTof)
     {
-        Depth2PointCloud(tofImage, rgb, cloud, usedTof);
+        Depth2PointCloud(tofImage, rgb, cloud, usedTof, 1);
     }
-    //双目深度图像转为3D点云
-    Depth2PointCloud(depth, rgb, cloud);
-
+    std::cout << "green is slam, blue is aanet, red is tof" << std::endl;
     //绕Z轴旋转180度
     Eigen::Matrix4f transform_1 = Eigen::Matrix4f::Identity();
     float theta = M_PI ;
