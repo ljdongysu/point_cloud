@@ -192,10 +192,55 @@ void SaveCloudPoint(const std::string &imageL, const std::string &image
     cout << "Point cloud saved." << endl;
 }
 
+void PointCloud2Depth(const std::vector<Eigen::Vector3d>& pointCloud, cv::Mat& depthImage, int width, int height)
+{
+    // 创建深度图像
+    depthImage = cv::Mat::zeros(height, width, CV_16U);
+
+    // 遍历点云数据
+    for (const auto& point : pointCloud)
+    {
+        // 计算深度值
+        double x = point.x();
+        double y = point.y();
+        double z = point.z();
+        if (z < 800 && z > 200)
+        {
+            std::cout << "x: " << x << ", y: " << y << ", z: " << z << std::endl;
+        }
+
+        int u = static_cast<int>(std::round(x * camera_fx / z) + camera_cx);
+        int v = static_cast<int>(std::round(y * camera_fy / z) + camera_cy);
+
+        // 更新深度图像
+        if (u >= 0 && u < width && v >= 0 && v < height)
+        {
+            unsigned short depthValue = static_cast<unsigned short>(z * camera_factor); // 假设深度单位为米，转换为厘米
+            depthImage.at<uint16_t>(v, u) = depthValue;
+        }
+    }
+}
+
 void ReadPointCloud(const std::string &pointCloudSavePLY)
 {
     PointCloud::Ptr cloudLoad(new PointCloud);
     pcl::io::loadPLYFile(pointCloudSavePLY, *cloudLoad);
+    cv::Mat image;
+
+    std::vector<Eigen::Vector3d> cloud;
+    for (int i = 0; i < cloudLoad->size(); ++i)
+    {
+        Eigen::Vector3d p;
+        p.x() = cloudLoad->points[i].x;
+        p.y() = cloudLoad->points[i].y;
+        p.z() = cloudLoad->points[i].z;
+
+        cloud.push_back(p);
+    }
+
+    PointCloud2Depth(cloud, image, 640, 400);
+
+    cv::imwrite("image.png", image);
 
     //显示点云图像
     pcl::visualization::CloudViewer viewer ("test");

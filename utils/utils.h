@@ -23,11 +23,15 @@
 typedef pcl::PointXYZRGBA PointT;
 typedef pcl::PointCloud<PointT> PointCloud;
 
-double camera_factor = 100;
-double camera_cx;// = 325.5;
-double camera_cy;// = 253.5;
-double camera_fx;// = 518.0;
-double camera_fy;// = 519.0;
+double camera_factor = 10;
+//double camera_cx = 314.9;// = 325.5;
+//double camera_cy = 222.4;// = 253.5;
+//double camera_fx = 287.2;// = 518.0;
+//double camera_fy = 287.2;// = 519.0;
+double camera_cx = 239.3;// = 325.5;
+double camera_cy = 178.91;// = 253.5;
+double camera_fx = 359.3;// = 518.0;
+double camera_fy = 359.3;// = 519.0;
 
 namespace psl
 {

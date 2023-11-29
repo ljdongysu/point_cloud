@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 3.20)
 project(cloud_point_save_show)
 project(cloud_point_read_show)
+project(orb_2_indemind)
 
 find_package(PCL REQUIRED)
 find_package(OpenCV REQUIRED)
@@ -30,3 +31,7 @@ target_link_libraries (cloud_point_save_show ${VTK_LIBRARIES} ${PCL_LIBRARIES} G
 add_executable(cloud_point_read_show read_point_cloud_show.cpp)
 
 target_link_libraries (cloud_point_read_show ${VTK_LIBRARIES} ${PCL_LIBRARIES} GetCamera)
+
+add_executable(orb_2_indemind orb2indemind.cpp)
+
+target_link_libraries (orb_2_indemind ${VTK_LIBRARIES} ${PCL_LIBRARIES} GetCamera)
